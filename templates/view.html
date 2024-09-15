@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <h2 class="text-2xl font-bold mb-4">Shared Content</h2>
+    <div class="bg-white p-4 rounded shadow">
+        <div class="mb-4">
+            <span class="font-bold">Type:</span> {{ content.content_type }}
+        </div>
+        <div class="mb-4">
+            <span class="font-bold">Created:</span> {{ content.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+        </div>
+        {% if content.content_type == 'text' %}
+            <pre><code class="language-plaintext">{{ content.content }}</code></pre>
+        {% elif content.content_type == 'image' %}
+            <img src="{{ url_for('raw_content', short_url=content.short_url) }}" alt="Shared Image" class="max-w-full h-auto">
+        {% elif content.content_type == 'video' %}
+            <video src="{{ url_for('raw_content', short_url=content.short_url) }}" controls class="max-w-full h-auto">
+                Your browser does not support the video tag.
+            </video>
+        {% endif %}
+    </div>
+    <div class="mt-4">
+        <h3 class="text-xl font-bold mb-2">Share this ByteBin:</h3>
+        <div class="flex items-center space-x-2">
+            <input type="text" id="shortUrl" value="{{ request.url }}" readonly class="flex-grow p-2 border rounded">
+            <button id="copyUrl" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                <i data-feather="copy"></i>
+            </button>
+        </div>
+        <div class="mt-4">
+            <h4 class="text-lg font-bold mb-2">Share on:</h4>
+            <div class="flex space-x-2">
+                <button class="share-btn" data-platform="twitter">
+                    <i data-feather="twitter"></i>
+                </button>
+                <button class="share-btn" data-platform="instagram">
+                    <i data-feather="instagram"></i>
+                </button>
+                <button class="share-btn" data-platform="telegram">
+                    <i data-feather="send"></i>
+                </button>
+                <button class="share-btn" data-platform="whatsapp">
+                    <i data-feather="message-circle"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

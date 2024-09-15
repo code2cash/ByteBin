@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold mb-8 text-center text-gray-800 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">ByteBin Neural Network</h1>
+    
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold mb-4 text-gray-700">Neural Pathways:</h2>
+        <div class="flex flex-wrap gap-2 bg-gray-900 p-4 rounded-lg shadow-inner">
+            <a href="{{ url_for('wall') }}" class="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition duration-300 ease-in-out transform hover:scale-105">All Synapses</a>
+            {% for tag in tags %}
+            <a href="{{ url_for('wall', tag=tag.name) }}" class="bg-gray-700 text-gray-200 px-4 py-2 rounded-full hover:bg-gray-600 transition duration-300 ease-in-out transform hover:scale-105">{{ tag.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for content in contents %}
+        <div class="bg-gray-900 rounded-lg shadow-lg overflow-hidden transform transition duration-500 hover:scale-105">
+            <div class="p-6">
+                <div class="mb-4 flex justify-between items-center">
+                    <span class="text-blue-400 font-semibold">{{ content.content_type|capitalize }} Node</span>
+                    <span class="text-gray-400 text-sm">{{ content.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                </div>
+                <div class="mb-4">
+                    {% if content.content_type == 'text' %}
+                        <p class="text-gray-300 line-clamp-3">{{ content.content[:150] }}...</p>
+                    {% elif content.content_type == 'image' %}
+                        <img src="{{ url_for('raw_content', short_url=content.short_url) }}" alt="Image preview" class="w-full h-48 object-cover rounded">
+                    {% elif content.content_type == 'video' %}
+                        <video src="{{ url_for('raw_content', short_url=content.short_url) }}" class="w-full h-48 object-cover rounded" controls>
+                            Your browser does not support the video tag.
+                        </video>
+                    {% endif %}
+                </div>
+                <div class="mb-4">
+                    {% for tag in content.tags %}
+                    <span class="inline-block bg-gray-800 rounded-full px-3 py-1 text-sm font-semibold text-blue-400 mr-2 mb-2">#{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+                <div class="flex items-center space-x-2 bg-gray-800 rounded-lg p-2 mt-4" id="url-container-{{ content.id }}">
+                    <a href="{{ url_for('view_content', short_url=content.short_url) }}" class="flex-grow text-blue-400 hover:text-blue-300 transition duration-300 truncate">
+                        <span class="mr-2 text-gray-500">{{ request.host_url }}</span>{{ content.short_url }}
+                    </a>
+                    <button class="copy-url-btn bg-gray-700 hover:bg-blue-600 rounded-full p-2 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" data-url="{{ request.host_url }}{{ content.short_url }}">
+                        <i data-feather="copy" class="text-gray-300 w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const copyButtons = document.querySelectorAll('.copy-url-btn');
+        copyButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const url = button.dataset.url;
+                navigator.clipboard.writeText(url).then(() => {
+                    const icon = button.querySelector('i');
+                    icon.setAttribute('data-feather', 'check');
+                    feather.replace();
+                    setTimeout(() => {
+                        icon.setAttribute('data-feather', 'copy');
+                        feather.replace();
+                    }, 2000);
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

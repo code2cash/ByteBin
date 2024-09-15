@@ -1,0 +1,40 @@
+[2024-09-15 07:00:00,188] ERROR in app: Exception on /Cy7OWkn [GET]
+Traceback (most recent call last):
+  File "/home/runner/bytebin-ai/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/bytebin-ai/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/bytebin-ai/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/bytebin-ai/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/bytebin-ai/main.py", line 66, in view_content
+    content.views += 1
+TypeError: unsupported operand type(s) for +=: 'NoneType' and 'int'
+172.31.196.14 - - [15/Sep/2024 07:00:00] "GET /Cy7OWkn HTTP/1.1" 500 -
+172.31.196.14 - - [15/Sep/2024 07:00:11] "GET /analytics HTTP/1.1" 200 -
+172.31.196.14 - - [15/Sep/2024 07:00:11] "GET /static/js/main.js HTTP/1.1" 304 -
+172.31.196.14 - - [15/Sep/2024 07:00:14] "GET /analytics HTTP/1.1" 200 -
+172.31.196.14 - - [15/Sep/2024 07:00:14] "GET /static/js/main.js HTTP/1.1" 304 -
+[2024-09-15 07:01:02,306] ERROR in app: Exception on /Cy7OWkn [GET]
+Traceback (most recent call last):
+  File "/home/runner/bytebin-ai/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/bytebin-ai/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/bytebin-ai/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/bytebin-ai/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/bytebin-ai/main.py", line 66, in view_content
+    content.views += 1
+TypeError: unsupported operand type(s) for +=: 'NoneType' and 'int'
+172.31.196.14 - - [15/Sep/2024 07:01:02] "GET /Cy7OWkn HTTP/1.1" 500 -

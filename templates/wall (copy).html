@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4">
+    <h2 class="text-2xl font-bold mb-4">ByteBin Wall</h2>
+    <div class="mb-4">
+        <h3 class="text-xl font-bold mb-2">Filter by Tag:</h3>
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ url_for('wall') }}" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">All</a>
+            {% for tag in tags %}
+            <a href="{{ url_for('wall', tag=tag.name) }}" class="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300">{{ tag.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for content in contents %}
+        <div class="bg-white rounded-lg shadow-md p-4">
+            <div class="mb-2">
+                <span class="font-bold">Type:</span> {{ content.content_type }}
+            </div>
+            <div class="mb-2">
+                <span class="font-bold">Preview:</span>
+                {% if content.content_type == 'text' %}
+                    <p class="truncate">{{ content.content[:100] }}...</p>
+                {% elif content.content_type == 'image' %}
+                    <img src="{{ url_for('raw_content', short_url=content.short_url) }}" alt="Image preview" class="w-full h-32 object-cover">
+                {% elif content.content_type == 'video' %}
+                    <video src="{{ url_for('raw_content', short_url=content.short_url) }}" class="w-full h-32 object-cover">
+                        Your browser does not support the video tag.
+                    </video>
+                {% endif %}
+            </div>
+            <div class="mb-2">
+                <span class="font-bold">Tags:</span>
+                {% for tag in content.tags %}
+                <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">{{ tag.name }}</span>
+                {% endfor %}
+            </div>
+            <div class="mb-2">
+                <span class="font-bold">Short URL:</span>
+                <div class="flex items-center space-x-2" id="url-container-{{ content.id }}">
+                    <a href="{{ url_for('view_content', short_url=content.short_url) }}" class="text-blue-500 hover:underline">
+                        {{ request.host_url }}{{ content.short_url }}
+                    </a>
+                    <button class="copy-url-btn bg-gray-200 hover:bg-gray-300 rounded p-1" data-url="{{ request.host_url }}{{ content.short_url }}">
+                        <i data-feather="copy"></i>
+                    </button>
+                </div>
+            </div>
+            <div>
+                <span class="font-bold">Created:</span> {{ content.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

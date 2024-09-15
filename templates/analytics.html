@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4">
+    <h2 class="text-2xl font-bold mb-4">ByteBin Analytics</h2>
+    
+    {% if error %}
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <strong class="font-bold">Error:</strong>
+        <span class="block sm:inline">{{ error }}</span>
+    </div>
+    {% endif %}
+
+    {% if not error %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div class="bg-white rounded-lg shadow-md p-4">
+            <h3 class="text-xl font-bold mb-2">Total Views</h3>
+            <p class="text-4xl">{{ total_views|default('N/A') }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-4">
+            <h3 class="text-xl font-bold mb-2">Total Shares</h3>
+            <p class="text-4xl">{{ total_shares|default('N/A') }}</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div class="bg-white rounded-lg shadow-md p-4">
+            <h3 class="text-xl font-bold mb-2">Most Viewed Content</h3>
+            {% if most_viewed %}
+            <table class="w-full">
+                <thead>
+                    <tr>
+                        <th class="text-left">Content</th>
+                        <th class="text-right">Views</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for content in most_viewed %}
+                    <tr>
+                        <td class="py-2">
+                            <a href="{{ url_for('view_content', short_url=content.short_url) }}" class="text-blue-500 hover:underline">
+                                {{ content.short_url }}
+                            </a>
+                        </td>
+                        <td class="text-right">{{ content.views }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No data available</p>
+            {% endif %}
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-4">
+            <h3 class="text-xl font-bold mb-2">Most Shared Content</h3>
+            {% if most_shared %}
+            <table class="w-full">
+                <thead>
+                    <tr>
+                        <th class="text-left">Content</th>
+                        <th class="text-right">Shares</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for content in most_shared %}
+                    <tr>
+                        <td class="py-2">
+                            <a href="{{ url_for('view_content', short_url=content.short_url) }}" class="text-blue-500 hover:underline">
+                                {{ content.short_url }}
+                            </a>
+                        </td>
+                        <td class="text-right">{{ content.shares }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No data available</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-4 mb-8">
+        <h3 class="text-xl font-bold mb-2">Tag Mind Map</h3>
+        <div id="tagMindMap" class="w-full h-96"></div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+    function createTagMindMap() {
+        const tagData = {{ tag_stats | tojson | safe }};
+        if (!tagData || tagData.length === 0) {
+            document.getElementById('tagMindMap').innerHTML = '<p>No tag data available</p>';
+            return;
+        }
+
+        const width = document.getElementById('tagMindMap').clientWidth;
+        const height = 400;
+
+        const svg = d3.select("#tagMindMap")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        const simulation = d3.forceSimulation(tagData)
+            .force("charge", d3.forceManyBody().strength(50))
+            .force("center", d3.forceCenter(width / 2, height / 2))
+            .force("collision", d3.forceCollide().radius(d => d.count * 2 + 20));
+
+        const nodes = svg.selectAll("g")
+            .data(tagData)
+            .enter()
+            .append("g")
+            .attr("transform", d => `translate(${d.x},${d.y})`);
+
+        nodes.append("circle")
+            .attr("r", d => d.count * 2 + 10)
+            .attr("fill", d => d3.interpolateBlues(d.count / Math.max(...tagData.map(t => t.count))));
+
+        nodes.append("text")
+            .text(d => d.name)
+            .attr("text-anchor", "middle")
+            .attr("dy", ".35em")
+            .attr("font-size", d => `${10 + d.count}px`);
+
+        simulation.on("tick", () => {
+            nodes.attr("transform", d => `translate(${d.x},${d.y})`);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        try {
+            createTagMindMap();
+        } catch (error) {
+            console.error('Error creating tag mind map:', error);
+            document.getElementById('tagMindMap').innerHTML = '<p>Error creating tag mind map</p>';
+        }
+    });
+</script>
+{% endblock %}

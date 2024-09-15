@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 class="text-2xl font-bold mb-4">Share Your Content</h2>
+    <form id="uploadForm" class="space-y-4">
+        <div>
+            <label for="contentType" class="block mb-2">Content Type</label>
+            <select id="contentType" name="contentType" class="w-full p-2 border rounded">
+                <option value="text">Text</option>
+                <option value="image">Image</option>
+                <option value="video">Video</option>
+            </select>
+        </div>
+        <div id="textContent">
+            <label for="content" class="block mb-2">Content</label>
+            <textarea id="content" name="content" rows="10" class="w-full p-2 border rounded"></textarea>
+        </div>
+        <div id="fileContent" class="hidden">
+            <label for="file" class="block mb-2">File</label>
+            <input type="file" id="file" name="file" class="w-full p-2 border rounded">
+        </div>
+        <div>
+            <label for="tags" class="block mb-2">Tags (up to 3, comma-separated)</label>
+            <input type="text" id="tags" name="tags" class="w-full p-2 border rounded" placeholder="e.g. funny, cats, memes">
+        </div>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Upload</button>
+    </form>
+    <div id="result" class="mt-4 hidden">
+        <h3 class="text-xl font-bold mb-2">Your ByteBin URL:</h3>
+        <div class="flex items-center space-x-2">
+            <input type="text" id="shortUrl" readonly class="flex-grow p-2 border rounded">
+            <button id="copyUrl" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                <i data-feather="copy"></i>
+            </button>
+        </div>
+        <div class="mt-4">
+            <h4 class="text-lg font-bold mb-2">Share on:</h4>
+            <div class="flex space-x-2">
+                <button class="share-btn" data-platform="twitter">
+                    <i data-feather="twitter"></i>
+                </button>
+                <button class="share-btn" data-platform="instagram">
+                    <i data-feather="instagram"></i>
+                </button>
+                <button class="share-btn" data-platform="telegram">
+                    <i data-feather="send"></i>
+                </button>
+                <button class="share-btn" data-platform="whatsapp">
+                    <i data-feather="message-circle"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-2xl font-bold mb-4">Recent Neural Activations</h2>
+
+            <div class="mb-4 flex space-x-2">
+                <button id="threeColView" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" title="3 Columns View">
+                    <i data-feather="grid" class="w-6 h-6"></i>
+                </button>
+                <button id="oneColView" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" title="1 Column View">
+                    <i data-feather="layout" class="w-6 h-6"></i>
+                </button>
+                <button id="listView" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" title="List View">
+                    <i data-feather="list" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+        <div id="contentGrid" class="grid gap-8 grid-cols-1 max-w-2xl mx-auto">
+            {% for content in contents %}
+            <div class="bg-gray-900 rounded-lg shadow-lg overflow-hidden">
+                <div class="p-6">
+                    <div class="mb-4 flex justify-between items-center">
+                        <span class="text-blue-400 font-semibold">{{ content.content_type|capitalize }} Node</span>
+                        <span class="text-gray-400 text-sm" title="{{ content.created_at.strftime('%Y-%m-%d %H:%M') }}">
+                            {{ content.created_at|time_ago }}
+                        </span>
+                    </div>
+                    <div class="mb-4">
+                        {% if content.content_type == 'text' %}
+                            <p class="text-gray-300 line-clamp-3">{{ content.content[:150] }}...</p>
+                        {% elif content.content_type == 'image' %}
+                            <img src="{{ url_for('raw_content', short_url=content.short_url) }}" alt="Image preview" class="w-full h-48 object-cover rounded">
+                        {% elif content.content_type == 'video' %}
+                            <video src="{{ url_for('raw_content', short_url=content.short_url) }}" class="w-full h-48 object-cover rounded" controls>
+                                Your browser does not support the video tag.
+                            </video>
+                        {% endif %}
+                    </div>
+                    <div class="mb-4">
+                        {% for tag in content.tags %}
+                        <span class="inline-block bg-gray-800 rounded-full px-3 py-1 text-sm font-semibold text-blue-400 mr-2 mb-2">#{{ tag.name }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="flex items-center space-x-2 bg-gray-800 rounded-lg p-2" id="url-container-{{ content.id }}">
+                        <a href="{{ url_for('view_content', short_url=content.short_url) }}" class="flex-grow text-blue-400 hover:text-blue-300 transition duration-300 truncate">
+                            <span class="mr-2 text-gray-500">{{ request.host_url }}</span>{{ content.short_url }}
+                        </a>
+                        <button class="copy-url-btn bg-gray-700 hover:bg-blue-600 rounded-full p-2 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" data-url="{{ request.host_url }}{{ content.short_url }}">
+                            <i data-feather="copy" class="text-gray-300 w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    const contentGrid = document.getElementById('contentGrid');
+    const threeColBtn = document.getElementById('threeColView');
+    const oneColBtn = document.getElementById('oneColView');
+    const listBtn = document.getElementById('listView');
+
+    threeColBtn.addEventListener('click', () => {
+        contentGrid.className = 'grid gap-8 grid-cols-3';
+    });
+
+    oneColBtn.addEventListener('click', () => {
+        contentGrid.className = 'grid gap-8 grid-cols-1 max-w-2xl mx-auto';
+    });
+
+    listBtn.addEventListener('click', () => {
+        contentGrid.className = 'space-y-4';
+    });
+});
+</script>
+
+{% endblock %}
